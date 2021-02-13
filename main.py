@@ -8,6 +8,8 @@ from session import Session
 import json
 from random import randrange
 
+# TODO: больше десяти вопросов
+
 text_phrases = {
     'begin_phrase': ['Привет!', 'Здравствуйте, начнем?', 'Здравствуйте', 'Привет, начнем?'],
     'user_return': ['С возвращением!', 'Я вас долго ждала'],
@@ -109,15 +111,14 @@ def old_user(res, req, user_id):
             dop = sprashai(number)
             res['response']['text'] = res['response']['tts'] = get_random_phrases('question') + '\n' + dop[0] + \
                                                                '\n\n' + get_random_phrases('answer') + '\n' + dop[1]
-            if number == 10:
-                user.number_question_sprashivai = 1
-            else:
-                user.number_question_sprashivai += 1
+            user.number_question_sprashivai += 1
         else:
             res['response']['text'] = res['response']['tts'] = 'Пока так далеко я не умею смотреть'
         sessionStorage.commit()
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
+    elif wants == 'nooooo!!':
+        res['response']['text'] = res['response']['tts'] = 'Я вас не поняла, повторите вопрос'
     else:
         res['response']['text'] = res['response']['tts'] = 'Функционал расширяется со временем, ждите новых функций. ' \
                                                            'Очередь: бесконечное количество вопросов ' \
@@ -149,14 +150,14 @@ def what_user_want(req, user_id):
     if any(i in tokens for i in ['далёкий']):
         user = sessionStorage.get_user(user_id)
         return user.last
-    if any(i in tokens for i in ['спрашивать', 'вопрос', 'любич']):
+    elif any(i in tokens for i in ['спрашивать', 'вопрос', 'любич']):
         if any(i in tokens for i in ['новое', 'последний']):
             user = sessionStorage.get_user(user_id)
             user.number_question_sprashivai = 1
-            sessionStorage.commit()
         return 'sprashivai'
-    if any(i in tokens for i in ['уметь', 'мочь', 'правило']):
+    elif any(i in tokens for i in ['уметь', 'мочь', 'правило']):
         return 'skill'
+    return 'nooooo!!'
 
 
 if __name__ == '__main__':

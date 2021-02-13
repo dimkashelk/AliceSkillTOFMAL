@@ -3,3 +3,4 @@ beautifulsoup4
 Flask
 SQLAlchemy
 pymorphy2
+lxml
