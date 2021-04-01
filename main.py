@@ -1,14 +1,12 @@
 import subprocess
 import pymorphy2
-from requests import get
-from bs4 import BeautifulSoup
 from flask import Flask, request, send_file
 import logging
 from session import Session
 import json
 from random import randrange
-
-# TODO: больше десяти вопросов
+from update_questions import update_db_questions
+import threading
 
 text_phrases = {
     'begin_phrase': ['Привет!', 'Здравствуйте, начнем?', 'Здравствуйте', 'Привет, начнем?'],
@@ -16,7 +14,7 @@ text_phrases = {
     'question': ['У Геннадия Рувимовича спрашивают:', 'Вот такой вопрос задали:', 'Вопрос:'],
     'answer': ['Геннадий Рувимович отвечает:', 'А вот так ответил Любич:', 'Ответ:'],
     'rules': ['Я могу рассказать вам последние вопросы Любичу на спрашивай, '
-              'а так же прочитать новости с лицеского сайта',
+              'а так же прочитать новости с лицейского сайта',
               'Прочитать новости с лицейского сайта? Или вопросы с спрашивай? '
               'Да легко, просто спросите',
               'Спросите у меня, что происходит на спрашивай или на лицейском сайте. '
@@ -96,50 +94,18 @@ def get_random_phrases(type_phrases):
 def old_user(res, req, user_id):
     wants = what_user_want(req, user_id)
     if wants == 'sprashivai':
-        user = sessionStorage.get_user(user_id)
+        number = -1
         for i in req['request']['nlu']['entities']:
             if i['type'] == 'YANDEX.NUMBER':
-                user.number_question_sprashivai = i['value']
+                number = i['value']
                 break
-        user = sessionStorage.get_user(user_id)
-        number = user.number_question_sprashivai
-        user.last = 'sprashivai'
-        if number == 0:
-            user.number_question_sprashivai += 1
-            number = user.number_question_sprashivai
-        if 1 <= number <= 10:
-            dop = sprashai(number)
-            res['response']['text'] = res['response']['tts'] = get_random_phrases('question') + '\n' + dop[0] + \
-                                                               '\n\n' + get_random_phrases('answer') + '\n' + dop[1]
-            user.number_question_sprashivai += 1
-        else:
-            res['response']['text'] = res['response']['tts'] = 'Пока так далеко я не умею смотреть'
-        sessionStorage.commit()
+        dop = sessionStorage.get_next_sprashivai(user_id, number)
+        res['response']['text'] = \
+            res['response']['tts'] = get_random_phrases(
+            'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
+            'answer') + '\n' + dop[1]
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
-    elif wants == 'nooooo!!':
-        res['response']['text'] = res['response']['tts'] = 'Я вас не поняла, повторите вопрос'
-    else:
-        res['response']['text'] = res['response']['tts'] = 'Функционал расширяется со временем, ждите новых функций. ' \
-                                                           'Очередь: бесконечное количество вопросов ' \
-                                                           '(пока только первые 10), ' \
-                                                           'комментарии, ' \
-                                                           'прикрепленные картинки, ' \
-                                                           'новости на tofmal'
-
-
-def sprashai(number):
-    res = get('http://sprashivai.ru/lubichgr').text
-    bs = BeautifulSoup(res, 'lxml')
-    blocks = bs.body.find('div', id='main_layout').find('div', id='content_layout').find('div',
-                                                                                         id='user_responses').find_all(
-        'div', attrs={'class': 'item'})
-    a = []
-    a.append(blocks[number - 1].find('div', attrs={'class': 'item_content'}).
-             find('div', attrs={'class': 'inbox_question'}).text)
-    a.append(blocks[number - 1].find('div', attrs={'class': 'item_content'}).
-             find('div', attrs={'class': 'text_answer'}).text)
-    return a
 
 
 def what_user_want(req, user_id):
@@ -150,15 +116,17 @@ def what_user_want(req, user_id):
     if any(i in tokens for i in ['далёкий']):
         user = sessionStorage.get_user(user_id)
         return user.last
-    elif any(i in tokens for i in ['спрашивать', 'вопрос', 'любич']):
+    if any(i in tokens for i in ['спрашивать', 'вопрос', 'любич']):
         if any(i in tokens for i in ['новое', 'последний']):
             user = sessionStorage.get_user(user_id)
             user.number_question_sprashivai = 1
+            sessionStorage.commit()
         return 'sprashivai'
-    elif any(i in tokens for i in ['уметь', 'мочь', 'правило']):
+    if any(i in tokens for i in ['уметь', 'мочь', 'правило']):
         return 'skill'
-    return 'nooooo!!'
 
 
 if __name__ == '__main__':
+    thread = threading.Thread(target=update_db_questions)
+    thread.start()
     app.run()
