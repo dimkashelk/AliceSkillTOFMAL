@@ -10,7 +10,7 @@ import threading
 
 text_phrases = {
     'begin_phrase': ['Привет!', 'Здравствуйте, начнем?', 'Здравствуйте', 'Привет, начнем?'],
-    'user_return': ['С возвращением!', 'Я вас долго ждала'],
+    'user_return': ['С возвращением!', 'Я вас так ждала'],
     'question': ['У Геннадия Рувимовича спрашивают:', 'Вот такой вопрос задали:', 'Вопрос:'],
     'answer': ['Геннадий Рувимович отвечает:', 'А вот так ответил Любич:', 'Ответ:'],
     'rules': ['Я могу рассказать вам последние вопросы Любичу на спрашивай, '
@@ -18,7 +18,11 @@ text_phrases = {
               'Прочитать новости с лицейского сайта? Или вопросы с спрашивай? '
               'Да легко, просто спросите',
               'Спросите у меня, что происходит на спрашивай или на лицейском сайте. '
-              'Так и задайте вопрос: "Что нового на тофмале?"']
+              'Так и задайте вопрос: "Что нового на тофмале?"'],
+    'not_understand': ['Не понятно, попробуйте перефразировать',
+                       'Что вы сказали?',
+                       'Я вас не понимаю',
+                       'Правила почитайте']
 }
 
 app = Flask(__name__)
@@ -58,15 +62,20 @@ def handle_dialog(req, res):
     if req['session']['new'] and sessionStorage.get_user(user_id) is None:
         new_user(res=res, user_id=user_id)
         return
-    res['response']['buttons'] = get_buttons()
+    res['response']['buttons'] = get_buttons('old_user')
     if req['session']['new']:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('user_return')
         return
     old_user(res=res, req=req, user_id=user_id)
 
 
-def get_buttons():
-    dop = ['Дальше', 'Что ты умеешь?']
+def get_buttons(param):
+    if param == 'new_user':
+        dop = ['Что ты умеешь?']
+    elif param == 'old_user':
+        dop = ['Дальше', 'Что ты умеешь?']
+    else:
+        dop = []
     title = []
     for i in dop:
         title.append({
@@ -84,6 +93,7 @@ def get_user_id(req):
 
 def new_user(res, user_id):
     res['response']['text'] = res['response']['tts'] = get_random_phrases('begin_phrase')
+    res['response']['buttons'] = get_buttons('new_user')
     sessionStorage.insert_new_user(user_id)
 
 
@@ -106,6 +116,8 @@ def old_user(res, req, user_id):
             'answer') + '\n' + dop[1]
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
+    else:
+        res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
 
 def what_user_want(req, user_id):

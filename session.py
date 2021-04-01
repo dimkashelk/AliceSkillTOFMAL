@@ -75,6 +75,7 @@ class Session:
                 questions.Question).filter(
                 questions.Question.id ==
                 self.get_count_questions() - number + 1).first()
+            user.number_question_sprashivai = number
         user.number_question_sprashivai += 1
         self.session.commit()
         return question.question, question.answer
