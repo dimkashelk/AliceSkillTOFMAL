@@ -129,7 +129,7 @@ def old_user(res, req, user_id):
         res['response']['card']['type'] = "BigImage"
         res['response']['card']['image_id'] = '1652229/a754a8a6586ac69c482b'
         res['response']['card']['title'] = 'Любич Геннадий Рувимович'
-        res['response']['card']['description'] = 'Директор МАОУ "Лицей №14" г. Тамбов'
+        res['response']['card']['description'] = get_random_phrases('about')
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
