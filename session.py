@@ -49,10 +49,6 @@ class Session:
         else:
             for i in list_questions:
                 self.add_question(i[0], i[1], i[2])
-        len_questions = len(list_questions)
-        list_users = self.session.query(users.User).all()
-        for user in list_users:
-            user.number_question_sprashivai += len_questions
         self.session.commit()
 
     def get_count_questions(self):
