@@ -65,6 +65,9 @@ def update_db_questions():
         dop = post('http://sprashivai.ru/responses/load/new', headers=headers, data=data).json()
         bs = BeautifulSoup(dop['q_html'], 'lxml')
         for i in bs.find_all('div', attrs={'class': 'item'}):
-            add_answers(i)
+            try:
+                add_answers(i)
+            except BaseException:
+                pass
         session.add_questions(a)
         sleep(180)
