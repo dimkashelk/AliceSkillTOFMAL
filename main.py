@@ -52,13 +52,16 @@ def update():
 
 @app.route('/', methods=['POST'])
 def main():
-    response = {
-        'session': request.json['session'],
-        'version': request.json['version'],
-        'response': {
-            'end_session': False,
+    try:
+        response = {
+            'session': request.json['session'],
+            'version': request.json['version'],
+            'response': {
+                'end_session': False,
+            }
         }
-    }
+    except BaseException:
+        return 'Alice skill'
     handle_dialog(request.json, response)
     logging.info(f'Response:  {response!r}')
     return json.dumps(response)
