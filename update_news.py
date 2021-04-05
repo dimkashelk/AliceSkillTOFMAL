@@ -32,8 +32,4 @@ def update_news():
                 break
         session = Session()
         session.add_newses(a)
-        print("A")
         sleep(300)
-
-
-update_news()

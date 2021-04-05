@@ -101,7 +101,6 @@ class Session:
         new.tofmal_id = tofmal_id
         self.session.add(new)
         self.session.commit()
-        print(f"Add news with number {tofmal_id}")
 
     def get_count_news(self):
         return len(self.session.query(news.News).all())
