@@ -64,7 +64,7 @@ class Session:
         self.session.commit()
 
     def get_count_questions(self):
-        return len(self.session.execute("SELECT id FROM questions").all())
+        return len(self.session.query(questions.Question).all())
 
     def get_question_by_time(self, time):
         return self.session.query(
