@@ -29,7 +29,10 @@ text_phrases = {
               'Квалификация: \nВысшая квалификационная категория\n\n'
               'Общий стаж работы: 29 лет\n\n'
               'Педагогический стаж: 25 лет\n\n'
-              'Кабинет: 410']
+              'Кабинет: 410'],
+    'not_found_question': ['Вопрос не найден',
+                           'Такого вопроса нет в базе',
+                           'Не удалось найти вопрос']
 }
 
 app = Flask(__name__)
@@ -120,6 +123,10 @@ def old_user(res, req, user_id):
                 number = i['value']
                 break
         dop = sessionStorage.get_next_sprashivai(user_id, number)
+        if dop is None:
+            res['response']['text'] = \
+                res['response']['tts'] = "Вопрос не найден"
+            return
         res['response']['text'] = \
             res['response']['tts'] = get_random_phrases(
             'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
@@ -146,7 +153,7 @@ def what_user_want(req, user_id):
         user = sessionStorage.get_user(user_id)
         return user.last
     if any(i in tokens for i in ['спрашивать', 'вопрос']):
-        if any(i in tokens for i in ['новое', 'последний']):
+        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный']):
             user = sessionStorage.get_user(user_id)
             user.number_question_sprashivai = 1
             sessionStorage.commit()

@@ -1,4 +1,4 @@
-from data import users, db_session, questions
+from data import users, db_session, questions, news
 
 
 class Session:
@@ -92,3 +92,11 @@ class Session:
         user.number_question_sprashivai += 1
         self.session.commit()
         return question.question, question.answer
+
+    def add_news(self, content, time, title):
+        new = news.News()
+        new.title = title
+        new.content = content
+        new.time = time
+        self.session.add(new)
+        self.session.commit()
