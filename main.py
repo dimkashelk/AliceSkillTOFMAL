@@ -7,12 +7,21 @@ import json
 from random import randrange
 from update_questions import update_db_questions
 import threading
+from update_news import update_news
 
 text_phrases = {
-    'begin_phrase': ['Привет!', 'Здравствуйте, начнем?', 'Здравствуйте', 'Привет, начнем?'],
-    'user_return': ['С возвращением!', 'Я вас так ждала'],
-    'question': ['У Геннадия Рувимовича спрашивают:', 'Вот такой вопрос задали:', 'Вопрос:'],
-    'answer': ['Геннадий Рувимович отвечает:', 'А вот так ответил Любич:', 'Ответ:'],
+    'begin_phrase': ['Привет!',
+                     'Здравствуйте, начнем?',
+                     'Здравствуйте',
+                     'Привет, начнем?'],
+    'user_return': ['С возвращением!',
+                    'Я вас так ждала'],
+    'question': ['У Геннадия Рувимовича спрашивают:',
+                 'Вот такой вопрос задали:',
+                 'Вопрос:'],
+    'answer': ['Геннадий Рувимович отвечает:',
+               'А вот так ответил Любич:',
+               'Ответ:'],
     'rules': ['Я могу рассказать вам последние вопросы Любичу на спрашивай, '
               'а так же прочитать новости с лицейского сайта',
               'Прочитать новости с лицейского сайта? Или вопросы с спрашивай? '
@@ -32,7 +41,16 @@ text_phrases = {
               'Кабинет: 410'],
     'not_found_question': ['Вопрос не найден',
                            'Такого вопроса нет в базе',
-                           'Не удалось найти вопрос']
+                           'Не удалось найти вопрос'],
+    'not_found_news': ['Запись не найдена',
+                       'Такой записи нет в базе',
+                       'Не удалось найти запись',
+                       'Новость не найдена',
+                       'Такой новости нет в базе',
+                       'Не удалось найти новость'],
+    'news': ['Нашла такую запись:',
+             'Давайте прочитаю:',
+             'Это может быть интересно:']
 }
 
 app = Flask(__name__)
@@ -82,7 +100,7 @@ def handle_dialog(req, res):
     old_user(res=res, req=req, user_id=user_id)
 
 
-def get_buttons(param):
+def get_buttons(param, url=''):
     if param == 'new_user':
         dop = ['Что ты умеешь?']
     elif param == 'old_user':
@@ -94,6 +112,12 @@ def get_buttons(param):
         title.append({
             "title": i.capitalize(),
             "hide": True
+        })
+    if url != '':
+        title.append({
+            "title": "Посмотреть на tofmal.ru",
+            "hide": True,
+            "url": url,
         })
     return title
 
@@ -125,7 +149,7 @@ def old_user(res, req, user_id):
         dop = sessionStorage.get_next_sprashivai(user_id, number)
         if dop is None:
             res['response']['text'] = \
-                res['response']['tts'] = "Вопрос не найден"
+                res['response']['tts'] = get_random_phrases('not_found_question')
             return
         res['response']['text'] = \
             res['response']['tts'] = get_random_phrases(
@@ -140,6 +164,20 @@ def old_user(res, req, user_id):
         res['response']['card']['image_id'] = '1652229/a754a8a6586ac69c482b'
         res['response']['card']['title'] = 'Любич Геннадий Рувимович'
         res['response']['card']['description'] = get_random_phrases('about')
+    elif wants == 'tofmal':
+        number = -1
+        for i in req['request']['nlu']['entities']:
+            if i['type'] == 'YANDEX.NUMBER':
+                number = i['value']
+                break
+        dop = sessionStorage.get_next_sprashivai(user_id, number)
+        if dop is None:
+            res['response']['text'] = \
+                res['response']['tts'] = get_random_phrases('not_found_news')
+            return
+        res['response']['text'] = \
+            res['response']['tts'] = get_random_phrases('news') + '\n' + dop[1] + '\n\n' + dop[2]
+        res['response']['buttons'] = get_buttons("old_user", f"https://tofmal.ru/news/{dop[0]}")
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
@@ -153,7 +191,7 @@ def what_user_want(req, user_id):
         user = sessionStorage.get_user(user_id)
         return user.last
     if any(i in tokens for i in ['спрашивать', 'вопрос']):
-        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный']):
+        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный', 'обновление']):
             user = sessionStorage.get_user(user_id)
             user.number_question_sprashivai = 1
             sessionStorage.commit()
@@ -162,9 +200,17 @@ def what_user_want(req, user_id):
         return 'skill'
     if any(i in tokens for i in ['кто', 'он', 'такой', 'рассказать', 'любич']):
         return 'about'
+    if any(i in tokens for i in ['сайт', 'лицей', 'новость', 'анонс']):
+        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный', 'обновление']):
+            user = sessionStorage.get_user(user_id)
+            user.number_news_tofmal = 1
+            sessionStorage.commit()
+        return 'tofmal'
 
 
 if __name__ == '__main__':
-    thread = threading.Thread(target=update_db_questions)
-    thread.start()
+    sprashivai = threading.Thread(target=update_db_questions)
+    sprashivai.start()
+    tofmal = threading.Thread(target=update_news)
+    tofmal.start()
     app.run()

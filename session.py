@@ -93,10 +93,43 @@ class Session:
         self.session.commit()
         return question.question, question.answer
 
-    def add_news(self, content, time, title):
+    def add_news(self, content, time, title, tofmal_id):
         new = news.News()
         new.title = title
         new.content = content
         new.time = time
+        new.tofmal_id = tofmal_id
         self.session.add(new)
         self.session.commit()
+        print(f"Add news with number {tofmal_id}")
+
+    def get_count_news(self):
+        return len(self.session.query(news.News).all())
+
+    def add_newses(self, dict_news):
+        count = 0
+        for i in sorted(dict_news.keys())[self.get_count_news():]:
+            self.add_news(dict_news[i]['content'], dict_news[i]['time'], dict_news[i]['title'], i)
+            count += 1
+        list_users = self.session.query(users.User).all()
+        for user in list_users:
+            user.number_news_tofmal += count
+        self.session.commit()
+
+    def get_next_tofmal(self, user_id, number=-1):
+        user = self.session.query(users.User).filter(users.User.id == user_id).first()
+        user.last = 'tofmal'
+        if number == -1:
+            new = self.session.query(
+                news.News).filter(
+                news.News.id ==
+                self.get_count_news() - user.number_news_tofmal + 1).first()
+        else:
+            new = self.session.query(
+                news.News).filter(
+                news.News.id ==
+                self.get_count_news() - number + 1).first()
+            user.number_news_tofmal = number
+        user.number_news_tofmal += 1
+        self.session.commit()
+        return new.id, new.title, new.content
