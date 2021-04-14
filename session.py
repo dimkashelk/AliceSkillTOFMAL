@@ -46,11 +46,9 @@ class Session:
         len_questions = 0
         if reverse:
             for i in list_questions[::-1]:
-                try:
+                if self.get_question_by_time(i[2]) is None:
                     self.add_question(i[0], i[1], i[2])
                     len_questions += 1
-                except BaseException:
-                    pass
         else:
             for i in list_questions:
                 try:
