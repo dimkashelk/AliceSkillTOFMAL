@@ -109,9 +109,7 @@ class Session:
 
     def add_newses(self, dict_news):
         count = 0
-        for i in sorted(dict_news.keys(),
-                        key=lambda x: datetime.fromisoformat(dict_news[x]['time'])
-                        )[self.get_count_news():]:
+        for i in sorted(dict_news.keys())[self.get_count_news():]:
             self.add_news(dict_news[i]['content'], dict_news[i]['time'], dict_news[i]['title'], i)
             count += 1
         list_users = self.session.query(users.User).all()
