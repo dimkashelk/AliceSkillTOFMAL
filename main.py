@@ -103,10 +103,8 @@ def handle_dialog(req, res):
 def get_buttons(param, url=''):
     if param == 'new_user':
         dop = ['Что ты умеешь?']
-    elif param == 'old_user':
-        dop = ['Дальше', 'Что ты умеешь?']
     else:
-        dop = []
+        dop = ['Дальше', 'Что ты умеешь?']
     title = []
     for i in dop:
         title.append({
@@ -114,11 +112,18 @@ def get_buttons(param, url=''):
             "hide": True
         })
     if url != '':
-        title.append({
-            "title": "Посмотреть на tofmal.ru",
-            "hide": True,
-            "url": url,
-        })
+        if param == 'sprashivai':
+            title.append({
+                "title": "Посмотреть на sprashivai.ru",
+                "hide": True,
+                "url": url,
+            })
+        elif param == 'tofmal':
+            title.append({
+                "title": "Посмотреть на tofmal.ru",
+                "hide": True,
+                "url": url,
+            })
     return title
 
 
@@ -152,9 +157,10 @@ def old_user(res, req, user_id):
                 res['response']['tts'] = get_random_phrases('not_found_question')
             return
         res['response']['text'] = \
-            res['response']['tts'] = get_random_phrases(
-            'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
-            'answer') + '\n' + dop[1]
+            res['response']['tts'] = fix_str(get_random_phrases(
+                    'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
+                    'answer') + '\n' + dop[1])
+        res['response']['buttons'] = get_buttons("sprashivai", f"http://sprashivai.ru{dop[2]}")
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
     elif wants == 'about':

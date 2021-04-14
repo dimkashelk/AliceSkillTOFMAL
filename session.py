@@ -93,7 +93,7 @@ class Session:
             return None
         user.number_question_sprashivai += 1
         self.session.commit()
-        return question.question, question.answer
+        return question.question, question.answer, question.url
 
     def add_news(self, content, time, title, tofmal_id):
         new = news.News()
