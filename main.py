@@ -170,7 +170,7 @@ def old_user(res, req, user_id):
             if i['type'] == 'YANDEX.NUMBER':
                 number = i['value']
                 break
-        dop = sessionStorage.get_next_sprashivai(user_id, number)
+        dop = sessionStorage.get_next_tofmal(user_id, number)
         if dop is None:
             res['response']['text'] = \
                 res['response']['tts'] = get_random_phrases('not_found_news')
