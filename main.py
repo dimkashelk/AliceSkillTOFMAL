@@ -53,7 +53,11 @@ text_phrases = {
              'Это может быть интересно:'],
     'count_sprashivai': ['Сейчас я могу озвучить',
                          'Выбирайте один из',
-                         'У меня']
+                         'У меня'],
+    'count_tofmal': ['Сейчас я могу озвучить',
+                     'Выбирайте одну из',
+                     'У меня',
+                     'Сейчас на сайте']
 }
 
 app = Flask(__name__)
@@ -201,6 +205,13 @@ def old_user(res, req, user_id):
             get_random_phrases('count_sprashivai') + \
             f' {count} ' + \
             question_morph.make_agree_with_number(count)
+    elif wants == 'count_tofmal':
+        news_morph = pymorphy2.MorphAnalyzer().parse('новость')[0]
+        count = sessionStorage.get_count_news()
+        res['response']['text'] = res['response']['tts'] = \
+            get_random_phrases('count_news') + \
+            f' {count} ' + \
+            news_morph.make_agree_with_number(count)
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
@@ -239,6 +250,8 @@ def what_user_want(req, user_id):
             user = sessionStorage.get_user(user_id)
             user.number_news_tofmal = 1
             sessionStorage.commit()
+        elif any(i in tokens for i in ['количество', 'сколько', 'весь']):
+            return 'count_tofmal'
         return 'tofmal'
 
 
