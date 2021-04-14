@@ -197,7 +197,7 @@ def old_user(res, req, user_id):
             return
         res['response']['text'] = \
             res['response']['tts'] = fix_str(get_random_phrases('news') + '\n' + dop[1] + '\n\n' + dop[2])
-        res['response']['buttons'] = get_buttons("old_user", f"https://tofmal.ru/news/{dop[0]}")
+        res['response']['buttons'] = get_buttons("tofmal", f"https://tofmal.ru/news/{dop[0]}")
     elif wants == 'count_sprashivai':
         question_morph = pymorphy2.MorphAnalyzer().parse('вопрос')[0]
         count = sessionStorage.get_count_questions()
