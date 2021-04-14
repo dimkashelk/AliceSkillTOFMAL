@@ -124,6 +124,12 @@ def get_buttons(param, url=''):
                 "hide": True,
                 "url": url,
             })
+        elif param == 'gr':
+            title.append({
+                    "title": "Перейти на tofmal.ru",
+                    "hide": True,
+                    "url": url,
+                })
     return title
 
 
@@ -170,6 +176,7 @@ def old_user(res, req, user_id):
         res['response']['card']['image_id'] = '1652229/a754a8a6586ac69c482b'
         res['response']['card']['title'] = 'Любич Геннадий Рувимович'
         res['response']['card']['description'] = get_random_phrases('about')
+        res['response']['buttons'] = get_buttons("gr", f"https://tofmal.ru/people/employee/52")
     elif wants == 'tofmal':
         number = -1
         for i in req['request']['nlu']['entities']:
