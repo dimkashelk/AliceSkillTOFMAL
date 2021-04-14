@@ -176,10 +176,17 @@ def old_user(res, req, user_id):
                 res['response']['tts'] = get_random_phrases('not_found_news')
             return
         res['response']['text'] = \
-            res['response']['tts'] = get_random_phrases('news') + '\n' + dop[1] + '\n\n' + dop[2]
+            res['response']['tts'] = fix_str(get_random_phrases('news') + '\n' + dop[1] + '\n\n' + dop[2])
         res['response']['buttons'] = get_buttons("old_user", f"https://tofmal.ru/news/{dop[0]}")
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
+
+
+def fix_str(string):
+    if len(string) < 1024:
+        return string
+    else:
+        return string[:1020] + '...'
 
 
 def what_user_want(req, user_id):
