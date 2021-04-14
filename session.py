@@ -133,6 +133,8 @@ class Session:
                 news.News.id ==
                 self.get_count_news() - number + 1).first()
             user.number_news_tofmal = number
+        if new is None:
+            return None
         user.number_news_tofmal += 1
         self.session.commit()
         return new.id, new.title, new.content
