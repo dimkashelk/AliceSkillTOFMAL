@@ -240,7 +240,7 @@ def what_user_want(req, user_id):
         elif any(i in tokens for i in ['количество', 'сколько', 'весь']):
             return 'count_sprashivai'
         return 'sprashivai'
-    if any(i in tokens for i in ['уметь', 'мочь', 'правило']):
+    if any(i in tokens for i in ['уметь', 'мочь', 'правило', 'помочь', 'помощь']):
         return 'skill'
     if any(i in tokens for i in ['кто', 'он', 'такой', 'любич']):
         return 'about'
