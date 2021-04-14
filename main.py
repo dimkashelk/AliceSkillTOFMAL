@@ -50,7 +50,10 @@ text_phrases = {
                        'Не удалось найти новость'],
     'news': ['Нашла такую запись:',
              'Давайте прочитаю:',
-             'Это может быть интересно:']
+             'Это может быть интересно:'],
+    'count_sprashivai': ['Сейчас я могу озвучить',
+                         'Выбирайте один из',
+                         'У меня']
 }
 
 app = Flask(__name__)
@@ -191,6 +194,13 @@ def old_user(res, req, user_id):
         res['response']['text'] = \
             res['response']['tts'] = fix_str(get_random_phrases('news') + '\n' + dop[1] + '\n\n' + dop[2])
         res['response']['buttons'] = get_buttons("old_user", f"https://tofmal.ru/news/{dop[0]}")
+    elif wants == 'count_sprashivai':
+        question_morph = pymorphy2.MorphAnalyzer().parse('вопрос')[0]
+        count = sessionStorage.get_count_questions()
+        res['response']['text'] = res['response']['tts'] = \
+            get_random_phrases('count_sprashivai') + \
+            f' {count} ' + \
+            question_morph.make_agree_with_number(count)
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
@@ -216,6 +226,8 @@ def what_user_want(req, user_id):
             user = sessionStorage.get_user(user_id)
             user.number_question_sprashivai = 1
             sessionStorage.commit()
+        elif any(i in tokens for i in ['количество', 'сколько', 'весь']):
+            return 'count_sprashivai'
         return 'sprashivai'
     if any(i in tokens for i in ['уметь', 'мочь', 'правило']):
         return 'skill'
