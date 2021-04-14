@@ -204,14 +204,14 @@ def old_user(res, req, user_id):
         res['response']['text'] = res['response']['tts'] = \
             get_random_phrases('count_sprashivai') + \
             f' {count} ' + \
-            question_morph.make_agree_with_number(count)
+            question_morph.make_agree_with_number(count).word
     elif wants == 'count_tofmal':
         news_morph = pymorphy2.MorphAnalyzer().parse('новость')[0]
         count = sessionStorage.get_count_news()
         res['response']['text'] = res['response']['tts'] = \
             get_random_phrases('count_news') + \
             f' {count} ' + \
-            news_morph.make_agree_with_number(count)
+            news_morph.make_agree_with_number(count).word
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
