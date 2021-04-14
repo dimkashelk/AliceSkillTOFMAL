@@ -9,3 +9,4 @@ class Question(SqlAlchemyBase):
     question = sqlalchemy.Column(sqlalchemy.String, default='')
     answer = sqlalchemy.Column(sqlalchemy.String, default='')
     time = sqlalchemy.Column(sqlalchemy.String, default='', unique=True)
+    url = sqlalchemy.Column(sqlalchemy.String, default='')

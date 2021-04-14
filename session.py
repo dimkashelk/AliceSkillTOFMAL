@@ -20,11 +20,12 @@ class Session:
     def commit(self):
         self.session.commit()
 
-    def add_question(self, question_text, answer, time):
+    def add_question(self, question_text, answer, time, url):
         question = questions.Question()
         question.question = question_text
         question.answer = answer
         question.time = time
+        question.url = url
         self.session.add(question)
         self.session.commit()
 
