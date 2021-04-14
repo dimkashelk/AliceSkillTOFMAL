@@ -40,21 +40,21 @@ class Session:
             all_questions.append([question.question, question.answer, question.time])
             i += 1
             question = self.get_question(i)
-        self.session.execute("DELETE FROM questions")
+        self.session.execute("DROP questions")
         for i, v in enumerate(all_questions[::-1]):
-            self.add_question(v[0], v[1], v[2])
+            self.add_question(v[0], v[1], v[2], v[3])
 
     def add_questions(self, list_questions, reverse=True):
         len_questions = 0
         if reverse:
             for i in list_questions[::-1]:
                 if self.get_question_by_time(i[2]) is None:
-                    self.add_question(i[0], i[1], i[2])
+                    self.add_question(i[0], i[1], i[2], i[3])
                     len_questions += 1
         else:
             for i in list_questions:
                 try:
-                    self.add_question(i[0], i[1], i[2])
+                    self.add_question(i[0], i[1], i[2], i[3])
                     len_questions += 1
                 except BaseException:
                     pass
