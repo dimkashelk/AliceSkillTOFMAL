@@ -27,7 +27,7 @@ text_phrases = {
               'Прочитать новости с лицейского сайта? Или вопросы с спрашивай? '
               'Да легко, просто спросите',
               'Спросите у меня, что происходит на спрашивай или на лицейском сайте. '
-              'Так и задайте вопрос: "Что нового на тофмале?"'],
+              'Так и задайте вопрос: "Что нового на лицейском сайте?"'],
     'not_understand': ['Не понятно, попробуйте перефразировать',
                        'Что вы сказали?',
                        'Я вас не понимаю',
@@ -126,10 +126,10 @@ def get_buttons(param, url=''):
             })
         elif param == 'gr':
             title.append({
-                    "title": "Перейти на tofmal.ru",
-                    "hide": True,
-                    "url": url,
-                })
+                "title": "Перейти на tofmal.ru",
+                "hide": True,
+                "url": url,
+            })
     return title
 
 
@@ -164,8 +164,8 @@ def old_user(res, req, user_id):
             return
         res['response']['text'] = \
             res['response']['tts'] = fix_str(get_random_phrases(
-                    'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
-                    'answer') + '\n' + dop[1])
+            'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
+            'answer') + '\n' + dop[1])
         res['response']['buttons'] = get_buttons("sprashivai", f"http://sprashivai.ru{dop[2]}")
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
@@ -207,21 +207,23 @@ def what_user_want(req, user_id):
     morph = pymorphy2.MorphAnalyzer()
     for i, v in enumerate(tokens):
         tokens[i] = morph.parse(v)[0].normal_form
-    if any(i in tokens for i in ['далёкий']):
+    if any(i in tokens for i in ['далёкий', 'следующий', 'последующий']):
         user = sessionStorage.get_user(user_id)
         return user.last
     if any(i in tokens for i in ['спрашивать', 'вопрос']):
-        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный', 'обновление']):
+        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
+                                     'обновление', 'сначала', 'снова', 'начало']):
             user = sessionStorage.get_user(user_id)
             user.number_question_sprashivai = 1
             sessionStorage.commit()
         return 'sprashivai'
     if any(i in tokens for i in ['уметь', 'мочь', 'правило']):
         return 'skill'
-    if any(i in tokens for i in ['кто', 'он', 'такой', 'рассказать', 'любич']):
+    if any(i in tokens for i in ['кто', 'он', 'такой', 'любич']):
         return 'about'
     if any(i in tokens for i in ['сайт', 'лицей', 'новость', 'анонс']):
-        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный', 'обновление']):
+        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
+                                     'обновление', 'сначала', 'снова', 'начало']):
             user = sessionStorage.get_user(user_id)
             user.number_news_tofmal = 1
             sessionStorage.commit()
