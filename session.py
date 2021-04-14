@@ -89,6 +89,8 @@ class Session:
                 questions.Question.id ==
                 self.get_count_questions() - number + 1).first()
             user.number_question_sprashivai = number
+        if question is None:
+            return None
         user.number_question_sprashivai += 1
         self.session.commit()
         return question.question, question.answer
