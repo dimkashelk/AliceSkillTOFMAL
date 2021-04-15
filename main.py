@@ -1,6 +1,5 @@
 import subprocess
-from pprint import pprint
-
+from ask_question import ask_question
 import pymorphy2
 from flask import Flask, request, send_file
 import logging
@@ -64,7 +63,15 @@ text_phrases = {
                      'Сейчас на сайте'],
     'show_url': ['Я вас подожду',
                  'Смотрю, вам стало интересно',
-                 'Возвращайтесь быстрее']
+                 'Возвращайтесь быстрее'],
+    'ask_question': ['Озвучьте ваш вопрос и он будет отправлен:',
+                     'Диктуйте вопрос:',
+                     'Я слушаю, запоминаю и отправляю:',
+                     'Вся во внимании:'],
+    'send_question': ['Ваш вопрос отправлен',
+                      'Все отправила. Теперь ждем ответа'],
+    'not_send_question': ['Не удалось отправить вопрос, попробуйте позже',
+                          'Извините, что-то сломалось. Ваш вопрос не отправлен']
 }
 
 app = Flask(__name__)
@@ -244,6 +251,14 @@ def old_user(res, req, user_id):
             news_morph.make_agree_with_number(count).word
     elif wants == 'show':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('show_url')
+    elif wants == 'listening':
+        res['response']['text'] = res['response']['tts'] = get_random_phrases('ask_question')
+    elif wants == 'send_question':
+        send = ask_question(req['request']['original_utterance'])
+        if send:
+            res['response']['text'] = res['response']['tts'] = get_random_phrases('send_question')
+        else:
+            res['response']['text'] = res['response']['tts'] = get_random_phrases('not_send_question')
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
@@ -261,15 +276,21 @@ def fix_str(string, mode='sprashivai'):
 def what_user_want(req, user_id):
     tokens = req['request']['nlu']['tokens']
     morph = pymorphy2.MorphAnalyzer()
+    user = sessionStorage.get_user(user_id)
+    if user.listening_question:
+        user.listening_question = 0
+        sessionStorage.commit()
+        return 'send_question'
     for i, v in enumerate(tokens):
         tokens[i] = morph.parse(v)[0].normal_form
+    if any(i in tokens for i in ['спросить', 'узнать', 'задать', 'отправить']):
+        user.listening_question = 1
+        return 'listening'
     if any(i in tokens for i in ['далёкий', 'следующий', 'последующий']):
-        user = sessionStorage.get_user(user_id)
         return user.last
     if any(i in tokens for i in ['спрашивать', 'вопрос']):
         if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
                                      'обновление', 'сначала', 'снова', 'начало']):
-            user = sessionStorage.get_user(user_id)
             user.number_question_sprashivai = 1
             sessionStorage.commit()
         elif any(i in tokens for i in ['количество', 'сколько', 'весь']):
@@ -280,7 +301,6 @@ def what_user_want(req, user_id):
     if any(i in tokens for i in ['кто', 'он', 'такой', 'любич']):
         return 'about'
     if any(i in tokens for i in ['сайт', 'лицей', 'новость', 'анонс']):
-        user = sessionStorage.get_user(user_id)
         if any(i in tokens for i in ['анонс']):
             if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
                                          'обновление', 'сначала', 'снова', 'начало']):
@@ -302,8 +322,8 @@ def what_user_want(req, user_id):
 
 
 if __name__ == '__main__':
-    sprashivai = threading.Thread(target=update_db_questions)
-    sprashivai.start()
-    tofmal = threading.Thread(target=update_news)
-    tofmal.start()
+    # sprashivai = threading.Thread(target=update_db_questions)
+    # sprashivai.start()
+    # tofmal = threading.Thread(target=update_news)
+    # tofmal.start()
     app.run()

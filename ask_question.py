@@ -19,14 +19,14 @@ headers_ask = {
 data = {
     'username': 'dimkashelk',
     'anonymously': 'yes',
-    'question': 'Тест #3',
+    'question': '',
     'hash': '0f78b2fc0205f45d543a7d34a2bd74affb493b68c04109f1e8d54c69e4f87f7d',
     'sig': 'cf34a798586afc97c22437f57f511377e0cfb9e570798c831f58e49420dc5d09'
 }
 
 
 def ask_question(text):
-    text += '\n\n\nОтправлено из лицейского навыка для Алисы'
+    text += '\n\n\nОтправлено из лицейского навыка Алисы'
     data['question'] = text
     dop = post('http://sprashivai.ru/question/ask', headers=headers_ask, data=data).json()
     return True if dop['status'] == 'ok' else False
