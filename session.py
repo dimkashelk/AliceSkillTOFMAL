@@ -95,12 +95,13 @@ class Session:
         self.session.commit()
         return question.question, question.answer, question.url
 
-    def add_news(self, content, time, title, tofmal_id):
+    def add_news(self, content, time, title, tofmal_id, is_notice):
         new = news.News()
         new.title = title
         new.content = content
         new.time = time
         new.tofmal_id = tofmal_id
+        new.is_notice = is_notice
         self.session.add(new)
         self.session.commit()
 
@@ -109,8 +110,11 @@ class Session:
 
     def add_newses(self, dict_news):
         count = 0
-        for i in sorted(dict_news.keys())[self.get_count_news():]:
-            self.add_news(dict_news[i]['content'], dict_news[i]['time'], dict_news[i]['title'], i)
+        for i in sorted(dict_news.keys(),
+                        key=lambda x: datetime.fromisoformat(dict_news[x]['time'])
+                        )[self.get_count_news():]:
+            self.add_news(dict_news[i]['content'], dict_news[i]['time'],
+                          dict_news[i]['title'], i, dict_news[i]['is_notice'])
             count += 1
         list_users = self.session.query(users.User).all()
         for user in list_users:

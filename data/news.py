@@ -10,3 +10,4 @@ class News(SqlAlchemyBase):
     time = sqlalchemy.Column(sqlalchemy.String)
     title = sqlalchemy.Column(sqlalchemy.String)
     tofmal_id = sqlalchemy.Column(sqlalchemy.INT)
+    is_notice = sqlalchemy.Column(sqlalchemy.Boolean)
