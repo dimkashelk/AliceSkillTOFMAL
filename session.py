@@ -106,6 +106,8 @@ class Session:
             self.session.add(new)
             self.session.commit()
         else:
+            if datetime.fromisoformat(time) > datetime.now():
+                return
             new = news.News()
             new.title = title
             new.content = content
