@@ -259,7 +259,7 @@ def what_user_want(req, user_id):
                 user = sessionStorage.get_user(user_id)
                 user.number_news_tofmal_notice = 1
                 sessionStorage.commit()
-                return 'notice_tofmal'
+            return 'notice_tofmal'
         elif any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
                                        'обновление', 'сначала', 'снова', 'начало']):
             user = sessionStorage.get_user(user_id)
