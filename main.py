@@ -171,8 +171,8 @@ def old_user(res, req, user_id):
             return
         res['response']['text'] = \
             res['response']['tts'] = fix_str(get_random_phrases(
-                    'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
-                    'answer') + '\n' + dop[1], mode='sprashivai')
+            'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
+            'answer') + '\n' + dop[1], mode='sprashivai')
         res['response']['buttons'] = get_buttons("sprashivai", f"http://sprashivai.ru{dop[2]}")
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
@@ -184,13 +184,17 @@ def old_user(res, req, user_id):
         res['response']['card']['title'] = 'Любич Геннадий Рувимович'
         res['response']['card']['description'] = get_random_phrases('about')
         res['response']['buttons'] = get_buttons("gr", f"https://tofmal.ru/people/employee/52")
-    elif wants == 'tofmal':
+    elif 'tofmal' in wants:
         number = -1
         for i in req['request']['nlu']['entities']:
             if i['type'] == 'YANDEX.NUMBER':
                 number = i['value']
                 break
-        dop = sessionStorage.get_next_tofmal(user_id, number)
+        dop = None
+        if wants == 'not_notice_tofmal':
+            dop = sessionStorage.get_next_tofmal(user_id, number, is_notice=False)
+        elif wants == 'notice_tofmal':
+            dop = sessionStorage.get_next_tofmal(user_id, number, is_notice=True)
         if dop is None:
             res['response']['text'] = \
                 res['response']['tts'] = get_random_phrases('not_found_news')
@@ -249,14 +253,21 @@ def what_user_want(req, user_id):
     if any(i in tokens for i in ['кто', 'он', 'такой', 'любич']):
         return 'about'
     if any(i in tokens for i in ['сайт', 'лицей', 'новость', 'анонс']):
-        if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
-                                     'обновление', 'сначала', 'снова', 'начало']):
+        if any(i in tokens for i in ['анонс']):
+            if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
+                                         'обновление', 'сначала', 'снова', 'начало']):
+                user = sessionStorage.get_user(user_id)
+                user.number_news_tofmal_notice = 1
+                sessionStorage.commit()
+                return 'notice_tofmal'
+        elif any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
+                                       'обновление', 'сначала', 'снова', 'начало']):
             user = sessionStorage.get_user(user_id)
-            user.number_news_tofmal = 1
+            user.number_news_tofmal_not_notice = 1
             sessionStorage.commit()
+            return 'not_notice_tofmal'
         elif any(i in tokens for i in ['количество', 'сколько', 'весь']):
             return 'count_tofmal'
-        return 'tofmal'
 
 
 if __name__ == '__main__':

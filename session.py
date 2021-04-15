@@ -123,8 +123,9 @@ class Session:
 
     def get_next_tofmal(self, user_id, number=-1, is_notice=False):
         user = self.session.query(users.User).filter(users.User.id == user_id).first()
-        user.last = 'tofmal'
         if is_notice:
+            user.last = 'notice_tofmal'
+            self.session.commit()
             all_notice = self.session.query(news.News).filter(news.News.is_notice).all()
             if number == -1:
                 if user.number_news_tofmal_notice > len(all_notice):
@@ -138,6 +139,8 @@ class Session:
             self.session.commit()
             return new.tofmal_id, new.title, new.content
         else:
+            user.last = 'not_notice_tofmal'
+            self.session.commit()
             not_notices = self.session.query(news.News).filter(not news.News.is_notice).all()
             if number == -1:
                 if user.number_news_tofmal_not_notice > len(not_notices):
@@ -148,4 +151,5 @@ class Session:
                 if number > len(not_notices):
                     return None
                 new = not_notices[-number]
+            self.session.commit()
             return new.tofmal_id, new.title, new.content
