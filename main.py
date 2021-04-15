@@ -71,7 +71,11 @@ text_phrases = {
     'send_question': ['Ваш вопрос отправлен',
                       'Все отправила. Теперь ждем ответа'],
     'not_send_question': ['Не удалось отправить вопрос, попробуйте позже',
-                          'Извините, что-то сломалось. Ваш вопрос не отправлен']
+                          'Извините, что-то сломалось. Ваш вопрос не отправлен'],
+    'cancellation': ['Отменила',
+                     'Хорошо, не будем спрашивать',
+                     'Пусть это останется между нами',
+                     'Вы можете продолжать, я не отправлю это']
 }
 
 app = Flask(__name__)
@@ -116,6 +120,9 @@ def handle_dialog(req, res):
         return
     res['response']['buttons'] = get_buttons('old_user')
     if req['session']['new']:
+        user = sessionStorage.get_user(user_id)
+        user.listening_question = 0
+        sessionStorage.commit()
         res['response']['text'] = res['response']['tts'] = get_random_phrases('user_return')
         return
     old_user(res=res, req=req, user_id=user_id)
@@ -203,8 +210,8 @@ def old_user(res, req, user_id):
             return
         res['response']['text'] = \
             res['response']['tts'] = fix_str(get_random_phrases(
-            'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
-            'answer') + '\n' + dop[1], mode='sprashivai')
+                    'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
+                    'answer') + '\n' + dop[1], mode='sprashivai')
         res['response']['buttons'] = get_buttons("sprashivai", f"http://sprashivai.ru{dop[2]}")
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
@@ -259,6 +266,8 @@ def old_user(res, req, user_id):
             res['response']['text'] = res['response']['tts'] = get_random_phrases('send_question')
         else:
             res['response']['text'] = res['response']['tts'] = get_random_phrases('not_send_question')
+    elif wants == 'cancellation':
+        res['response']['text'] = res['response']['tts'] = get_random_phrases('cancellation')
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
@@ -278,6 +287,10 @@ def what_user_want(req, user_id):
     morph = pymorphy2.MorphAnalyzer()
     user = sessionStorage.get_user(user_id)
     if user.listening_question:
+        if any(i in tokens for i in ['отмена', 'перестать']):
+            user.listening_question = 0
+            sessionStorage.commit()
+            return 'cancellation'
         user.listening_question = 0
         sessionStorage.commit()
         return 'send_question'
