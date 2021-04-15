@@ -127,7 +127,7 @@ class Session:
         if is_notice:
             user.last = 'notice_tofmal'
             self.session.commit()
-            all_notice = self.session.query(news.News).filter(news.News.is_notice).all()
+            all_notice = self.session.query(news.News).filter(news.News.is_notice == 1).all()
             if number == -1:
                 if user.number_news_tofmal_notice > len(all_notice):
                     return None
@@ -142,7 +142,7 @@ class Session:
         else:
             user.last = 'not_notice_tofmal'
             self.session.commit()
-            not_notices = self.session.query(news.News).filter(not news.News.is_notice).all()
+            not_notices = self.session.query(news.News).filter(news.News.is_notice == 0).all()
             if number == -1:
                 if user.number_news_tofmal_not_notice > len(not_notices):
                     return None

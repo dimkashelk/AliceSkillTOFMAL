@@ -253,21 +253,23 @@ def what_user_want(req, user_id):
     if any(i in tokens for i in ['кто', 'он', 'такой', 'любич']):
         return 'about'
     if any(i in tokens for i in ['сайт', 'лицей', 'новость', 'анонс']):
+        user = sessionStorage.get_user(user_id)
         if any(i in tokens for i in ['анонс']):
             if any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
                                          'обновление', 'сначала', 'снова', 'начало']):
-                user = sessionStorage.get_user(user_id)
                 user.number_news_tofmal_notice = 1
+                user.last = 'notice_tofmal'
                 sessionStorage.commit()
             return 'notice_tofmal'
         elif any(i in tokens for i in ['новое', 'последний', 'новый', 'актуальный',
                                        'обновление', 'сначала', 'снова', 'начало']):
-            user = sessionStorage.get_user(user_id)
             user.number_news_tofmal_not_notice = 1
-            sessionStorage.commit()
         elif any(i in tokens for i in ['количество', 'сколько', 'весь']):
             return 'count_tofmal'
+        user.last = 'not_notice_tofmal'
+        sessionStorage.commit()
         return 'not_notice_tofmal'
+    return 'not_understand'
 
 
 if __name__ == '__main__':
