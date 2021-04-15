@@ -1,4 +1,6 @@
 import subprocess
+from pprint import pprint
+
 import pymorphy2
 from flask import Flask, request, send_file
 import logging
@@ -292,7 +294,7 @@ def what_user_want(req, user_id):
         user.last = 'not_notice_tofmal'
         sessionStorage.commit()
         return 'not_notice_tofmal'
-    if 'Посмотреть ' in req['request']['original_utterance']:
+    if req['request']['type'] == 'ButtonPressed' and 'посмотреть' in req['request']['nlu']['tokens']:
         return 'show'
     return 'not_understand'
 
