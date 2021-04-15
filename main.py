@@ -171,8 +171,8 @@ def old_user(res, req, user_id):
             return
         res['response']['text'] = \
             res['response']['tts'] = fix_str(get_random_phrases(
-            'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
-            'answer') + '\n' + dop[1])
+                    'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
+                    'answer') + '\n' + dop[1], mode='sprashivai')
         res['response']['buttons'] = get_buttons("sprashivai", f"http://sprashivai.ru{dop[2]}")
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
@@ -196,7 +196,8 @@ def old_user(res, req, user_id):
                 res['response']['tts'] = get_random_phrases('not_found_news')
             return
         res['response']['text'] = \
-            res['response']['tts'] = fix_str(get_random_phrases('news') + '\n' + dop[1] + '\n\n' + dop[2])
+            res['response']['tts'] = fix_str(get_random_phrases('news') + '\n' + dop[1] + '\n\n' + dop[2],
+                                             mode='tofmal')
         res['response']['buttons'] = get_buttons("tofmal", f"https://tofmal.ru/news/{dop[0]}")
     elif wants == 'count_sprashivai':
         question_morph = pymorphy2.MorphAnalyzer().parse('вопрос')[0]
@@ -216,11 +217,14 @@ def old_user(res, req, user_id):
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
 
-def fix_str(string):
+def fix_str(string, mode='sprashivai'):
     if len(string) < 1024:
         return string
     else:
-        return string[:1020] + '...'
+        if mode == 'sprashivai':
+            return string[:990] + '\nСмотреть на sprashivai.ru'
+        elif mode == 'tofmal':
+            return string[:990] + '\nСмотреть на tofmal.ru'
 
 
 def what_user_want(req, user_id):
