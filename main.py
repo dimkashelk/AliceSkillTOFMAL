@@ -265,9 +265,9 @@ def what_user_want(req, user_id):
             user = sessionStorage.get_user(user_id)
             user.number_news_tofmal_not_notice = 1
             sessionStorage.commit()
-            return 'not_notice_tofmal'
         elif any(i in tokens for i in ['количество', 'сколько', 'весь']):
             return 'count_tofmal'
+        return 'not_notice_tofmal'
 
 
 if __name__ == '__main__':
