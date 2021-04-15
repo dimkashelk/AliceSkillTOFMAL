@@ -118,7 +118,8 @@ class Session:
             count += 1
         list_users = self.session.query(users.User).all()
         for user in list_users:
-            user.number_news_tofmal += count
+            user.number_news_tofmal_not_notice += count
+            user.number_news_tofmal_notice += count
         self.session.commit()
 
     def get_next_tofmal(self, user_id, number=-1, is_notice=False):
