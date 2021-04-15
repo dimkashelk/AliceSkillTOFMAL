@@ -121,22 +121,31 @@ class Session:
             user.number_news_tofmal += count
         self.session.commit()
 
-    def get_next_tofmal(self, user_id, number=-1):
+    def get_next_tofmal(self, user_id, number=-1, is_notice=False):
         user = self.session.query(users.User).filter(users.User.id == user_id).first()
         user.last = 'tofmal'
-        if number == -1:
-            new = self.session.query(
-                news.News).filter(
-                news.News.id ==
-                self.get_count_news() - user.number_news_tofmal + 1).first()
+        if is_notice:
+            all_notice = self.session.query(news.News).filter(news.News.is_notice).all()
+            if number == -1:
+                if user.number_news_tofmal_notice > len(all_notice):
+                    return None
+                new = all_notice[-user.number_news_tofmal_notice]
+                user.number_news_tofmal_notice += 1
+            else:
+                if number > len(all_notice):
+                    return None
+                new = all_notice[-number]
+            self.session.commit()
+            return new.tofmal_id, new.title, new.content
         else:
-            new = self.session.query(
-                news.News).filter(
-                news.News.id ==
-                self.get_count_news() - number + 1).first()
-            user.number_news_tofmal = number
-        if new is None:
-            return None
-        user.number_news_tofmal += 1
-        self.session.commit()
-        return new.id, new.title, new.content
+            not_notices = self.session.query(news.News).filter(not news.News.is_notice).all()
+            if number == -1:
+                if user.number_news_tofmal_not_notice > len(not_notices):
+                    return None
+                new = not_notices[-user.number_news_tofmal_not_notice]
+                user.number_news_tofmal_not_notice += 1
+            else:
+                if number > len(not_notices):
+                    return None
+                new = not_notices[-number]
+            return new.tofmal_id, new.title, new.content
