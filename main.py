@@ -75,7 +75,10 @@ text_phrases = {
     'cancellation': ['Отменила',
                      'Хорошо, не будем спрашивать',
                      'Пусть это останется между нами',
-                     'Вы можете продолжать, я не отправлю это']
+                     'Вы можете продолжать, я не отправлю это'],
+    'version': ['Текущие возможности: читать вопросы (стабильно), '
+                'читать новости (стабильно), '
+                'отправлять вопросы (тестируется)']
 }
 
 app = Flask(__name__)
@@ -210,8 +213,8 @@ def old_user(res, req, user_id):
             return
         res['response']['text'] = \
             res['response']['tts'] = fix_str(get_random_phrases(
-                    'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
-                    'answer') + '\n' + dop[1], mode='sprashivai')
+            'question') + '\n' + dop[0] + '\n\n' + get_random_phrases(
+            'answer') + '\n' + dop[1], mode='sprashivai')
         res['response']['buttons'] = get_buttons("sprashivai", f"http://sprashivai.ru{dop[2]}")
     elif wants == 'skill':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('rules')
@@ -268,6 +271,8 @@ def old_user(res, req, user_id):
             res['response']['text'] = res['response']['tts'] = get_random_phrases('not_send_question')
     elif wants == 'cancellation':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('cancellation')
+    elif wants == 'version':
+        res['response']['text'] = res['response']['tts'] = get_random_phrases('version')
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
@@ -331,12 +336,14 @@ def what_user_want(req, user_id):
         return 'not_notice_tofmal'
     if req['request']['type'] == 'ButtonPressed' and 'посмотреть' in req['request']['nlu']['tokens']:
         return 'show'
+    elif any(i in tokens for i in ['версия', 'текущий']):
+        return 'version'
     return 'not_understand'
 
 
 if __name__ == '__main__':
-    # sprashivai = threading.Thread(target=update_db_questions)
-    # sprashivai.start()
-    # tofmal = threading.Thread(target=update_news)
-    # tofmal.start()
+    sprashivai = threading.Thread(target=update_db_questions)
+    sprashivai.start()
+    tofmal = threading.Thread(target=update_news)
+    tofmal.start()
     app.run()
