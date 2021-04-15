@@ -1,4 +1,4 @@
-from data import users, db_session, questions, news
+from data import users, db_session, questions, news, news_notice
 from datetime import datetime
 
 
@@ -96,14 +96,24 @@ class Session:
         return question.question, question.answer, question.url
 
     def add_news(self, content, time, title, tofmal_id, is_notice):
-        new = news.News()
-        new.title = title
-        new.content = content
-        new.time = time
-        new.tofmal_id = tofmal_id
-        new.is_notice = is_notice
-        self.session.add(new)
-        self.session.commit()
+        if is_notice:
+            new = news_notice.News()
+            new.title = title
+            new.content = content
+            new.time = time
+            new.tofmal_id = tofmal_id
+            new.is_notice = is_notice
+            self.session.add(new)
+            self.session.commit()
+        else:
+            new = news.News()
+            new.title = title
+            new.content = content
+            new.time = time
+            new.tofmal_id = tofmal_id
+            new.is_notice = is_notice
+            self.session.add(new)
+            self.session.commit()
 
     def get_count_news(self):
         return len(self.session.query(news.News).all())
@@ -127,7 +137,7 @@ class Session:
         if is_notice:
             user.last = 'notice_tofmal'
             self.session.commit()
-            all_notice = self.session.query(news.News).filter(news.News.is_notice == 1).all()
+            all_notice = self.session.query(news_notice.News).all()
             if number == -1:
                 if user.number_news_tofmal_notice > len(all_notice):
                     return None
