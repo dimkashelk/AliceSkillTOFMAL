@@ -21,6 +21,9 @@ def add_answers(i):
                find('a', attrs={'class': 'time_link'}).
                find('span', attrs={'class': 't_timer'}).
                find('span', attrs={'class': 't_st'}).text)
+    dop.append(block.find('div', attrs={'class': 'item_content'}).
+               find('div', attrs={'class': 'nq_time'}).
+               find('a', attrs={'class': 'time_link'}).get('href'))
     a.append(dop)
 
 
