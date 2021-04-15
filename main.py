@@ -57,7 +57,10 @@ text_phrases = {
     'count_tofmal': ['Сейчас я могу озвучить',
                      'Выбирайте одну из',
                      'У меня',
-                     'Сейчас на сайте']
+                     'Сейчас на сайте'],
+    'show_url': ['Я вас подожду',
+                 'Смотрю, вам стало интересно',
+                 'Возвращайтесь быстрее']
 }
 
 app = Flask(__name__)
@@ -124,18 +127,36 @@ def get_buttons(param, url=''):
                 "title": "Посмотреть на sprashivai.ru",
                 "hide": True,
                 "url": url,
+                "payload": {
+                    "request": {
+                        "command": "show",
+                        "original_utterance": "show"
+                    }
+                }
             })
         elif param == 'tofmal':
             title.append({
                 "title": "Посмотреть на tofmal.ru",
                 "hide": True,
                 "url": url,
+                "payload": {
+                    "request": {
+                        "command": "show",
+                        "original_utterance": "show"
+                    }
+                }
             })
         elif param == 'gr':
             title.append({
                 "title": "Перейти на tofmal.ru",
                 "hide": True,
                 "url": url,
+                "payload": {
+                    "request": {
+                        "command": "show",
+                        "original_utterance": "show"
+                    }
+                }
             })
     return title
 
@@ -217,6 +238,8 @@ def old_user(res, req, user_id):
             get_random_phrases('count_news') + \
             f' {count} ' + \
             news_morph.make_agree_with_number(count).word
+    elif wants == 'show':
+        res['response']['text'] = res['response']['tts'] = get_random_phrases('show_url')
     else:
         res['response']['text'] = res['response']['tts'] = get_random_phrases('not_understand')
 
@@ -269,6 +292,8 @@ def what_user_want(req, user_id):
         user.last = 'not_notice_tofmal'
         sessionStorage.commit()
         return 'not_notice_tofmal'
+    if 'Посмотреть ' in req['request']['original_utterance']:
+        return 'show'
     return 'not_understand'
 
 
