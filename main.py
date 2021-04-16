@@ -92,6 +92,7 @@ sessionStorage = Session()
 
 @app.route('/log')
 def get_log():
+    return 'Test'
     return open('app.log', 'r').read()
 
 
