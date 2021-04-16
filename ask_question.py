@@ -17,11 +17,11 @@ headers_ask = {
 }
 
 data = {
-    'username': 'dimkashelk',
+    'username': 'lubichgr',
     'anonymously': 'yes',
     'question': '',
-    'hash': '0f78b2fc0205f45d543a7d34a2bd74affb493b68c04109f1e8d54c69e4f87f7d',
-    'sig': 'cf34a798586afc97c22437f57f511377e0cfb9e570798c831f58e49420dc5d09'
+    'hash': 'd2cfe992bcc36307412216f97c2028de8fb8eb0b91869b787a3d818da17e0ef0',
+    'sig': '5bdd31e17e9133d98beefa1ace51da3359b9c0e26e815adc8c85f5515df6480e'
 }
 
 
