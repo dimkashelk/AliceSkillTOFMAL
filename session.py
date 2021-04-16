@@ -21,6 +21,8 @@ class Session:
         self.session.commit()
 
     def add_question(self, question_text, answer, time, url):
+        if self.session.query(questions.Question).filter(questions.Question.url == url).first() is not None:
+            return
         question = questions.Question()
         question.question = question_text
         question.answer = answer
