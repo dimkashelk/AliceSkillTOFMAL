@@ -83,8 +83,6 @@ text_phrases = {
 
 app = Flask(__name__)
 
-with open('app.log', 'w') as file:
-    file.write('Test #30')
 logging.basicConfig(level=logging.INFO, filename='app.log')
 
 sessionStorage = Session()
@@ -92,12 +90,16 @@ sessionStorage = Session()
 
 @app.route('/log')
 def get_log():
-    return open('app.log', 'r').read()
+    return send_file('app.log')
 
 
-@app.route('/dop')
+@app.route('/update_db')
 def dop_log():
-    return send_file('dop.txt')
+    sprashivai = threading.Thread(target=update_db_questions)
+    sprashivai.start()
+    tofmal = threading.Thread(target=update_news)
+    tofmal.start()
+    return 'Update start'
 
 
 @app.route('/update')
@@ -349,8 +351,4 @@ def what_user_want(req, user_id):
 
 
 if __name__ == '__main__':
-    sprashivai = threading.Thread(target=update_db_questions)
-    sprashivai.start()
-    tofmal = threading.Thread(target=update_news)
-    tofmal.start()
     app.run()
