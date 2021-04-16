@@ -72,8 +72,8 @@ def update_db_questions():
         }
         try:
             dop = post('http://sprashivai.ru/responses/load/new', headers=headers, data=data)
-            print(dop, file=open('dop.txt'))
-            print(dop, file=open('content.txt'))
+            print(dop, file=open('dop.txt', 'w'))
+            print(dop, file=open('content.txt', 'w'))
             dop = dop.json()
         except BaseException:
             print("DON'T CONNECT TO sprashivai")
