@@ -83,6 +83,8 @@ text_phrases = {
 
 app = Flask(__name__)
 
+with open('app.log', 'w') as file:
+    file.write('')
 logging.basicConfig(level=logging.INFO, filename='app.log')
 
 sessionStorage = Session()
