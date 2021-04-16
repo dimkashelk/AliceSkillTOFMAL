@@ -75,8 +75,9 @@ def update_db_questions():
             print(dop, file=open('dop.txt', 'w'))
             print(dop, file=open('content.txt', 'w'))
             dop = dop.json()
-        except BaseException:
+        except BaseException as e:
             print("DON'T CONNECT TO sprashivai")
+            print(e, file=open('error.txt', 'w'))
             sleep(randint(160, 250))
             continue
         bs = BeautifulSoup(dop['q_html'], 'lxml')

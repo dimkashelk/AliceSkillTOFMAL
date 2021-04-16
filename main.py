@@ -103,6 +103,11 @@ def content_log():
     return send_file('content.txt')
 
 
+@app.route('/error')
+def error_log():
+    return send_file('error.txt')
+
+
 @app.route('/update')
 def update():
     process = subprocess.Popen('/bin/bash update_from_git.sh'.split())
