@@ -79,8 +79,5 @@ def update_db_questions():
         bs = BeautifulSoup(dop['q_html'], 'lxml')
         for i in bs.find_all('div', attrs={'class': 'item'}):
             add_answers(i)
-        try:
-            session.add_questions(a)
-        except BaseException:
-            pass
+        session.add_questions(a)
         sleep(randint(160, 250))
