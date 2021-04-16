@@ -98,16 +98,6 @@ def dop_log():
     return send_file('dop.txt')
 
 
-@app.route('/content')
-def content_log():
-    return send_file('content.txt')
-
-
-@app.route('/error')
-def error_log():
-    return send_file('error.txt')
-
-
 @app.route('/update')
 def update():
     process = subprocess.Popen('/bin/bash update_from_git.sh'.split())
@@ -357,10 +347,6 @@ def what_user_want(req, user_id):
 
 
 if __name__ == '__main__':
-    with open('content.txt', 'w') as file:
-        file.write('Test')
-    with open('error.txt', 'w') as file:
-        file.write('Test')
     sprashivai = threading.Thread(target=update_db_questions)
     sprashivai.start()
     tofmal = threading.Thread(target=update_news)

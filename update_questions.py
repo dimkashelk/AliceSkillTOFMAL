@@ -1,10 +1,8 @@
 from requests import post, get
-import requests
 from bs4 import BeautifulSoup
 from time import sleep
 from session import Session
 from random import randint
-import cfscrape
 
 
 def add_answers(i):
@@ -70,16 +68,14 @@ def update_db_questions():
             'username': 'lubichgr',
             'offset': session.get_last_time()
         }
-        try:
-            dop = post('http://sprashivai.ru/responses/load/new', headers=headers, data=data)
-            print(dop, file=open('dop.txt', 'w'))
-            print(dop, file=open('content.txt', 'w'))
-            dop = dop.json()
-        except BaseException as e:
-            print("DON'T CONNECT TO sprashivai")
-            print(e, file=open('error.txt', 'w'))
-            sleep(randint(160, 250))
-            continue
+        # try:
+        dop = post('http://sprashivai.ru/responses/load/new', headers=headers, data=data)
+        dop = dop.json()
+        # except BaseException as e:
+        #     print("DON'T CONNECT TO sprashivai")
+        #     print(e, file=open('error.txt', 'w'))
+        #     sleep(randint(160, 250))
+        #     continue
         bs = BeautifulSoup(dop['q_html'], 'lxml')
         for i in bs.find_all('div', attrs={'class': 'item'}):
             add_answers(i)
