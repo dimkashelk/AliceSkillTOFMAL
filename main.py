@@ -93,6 +93,16 @@ def get_log():
     return send_file('app.log')
 
 
+@app.route('/dop')
+def dop_log():
+    return send_file('dop.txt')
+
+
+@app.route('/content')
+def content_log():
+    return send_file('content.txt')
+
+
 @app.route('/update')
 def update():
     process = subprocess.Popen('/bin/bash update_from_git.sh'.split())

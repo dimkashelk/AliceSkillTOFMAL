@@ -71,7 +71,10 @@ def update_db_questions():
             'offset': session.get_last_time()
         }
         try:
-            dop = post('http://sprashivai.ru/responses/load/new', headers=headers, data=data).json()
+            dop = post('http://sprashivai.ru/responses/load/new', headers=headers, data=data)
+            print(dop, file=open('dop.txt'))
+            print(dop, file=open('content.txt'))
+            dop = dop.json()
         except BaseException:
             print("DON'T CONNECT TO sprashivai")
             sleep(randint(160, 250))
