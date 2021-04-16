@@ -21,7 +21,13 @@ class Session:
         self.session.commit()
 
     def add_question(self, question_text, answer, time, url):
-        if self.session.query(questions.Question).filter(questions.Question.url == url).first() is not None:
+        question = self.session.query(questions.Question).filter(questions.Question.url == url).first()
+        if question is not None:
+            question.question = question_text
+            question.answer = answer
+            question.time = time
+            question.url = url
+            self.session.commit()
             return
         question = questions.Question()
         question.question = question_text
@@ -99,6 +105,15 @@ class Session:
 
     def add_news(self, content, time, title, tofmal_id, is_notice):
         if is_notice:
+            new = self.session.query(news_notice.News).filter(news_notice.News.time == time).first()
+            if new is not None:
+                new.title = title
+                new.content = content
+                new.time = time
+                new.tofmal_id = tofmal_id
+                new.is_notice = is_notice
+                self.session.commit()
+                return
             new = news_notice.News()
             new.title = title
             new.content = content
@@ -109,6 +124,15 @@ class Session:
             self.session.commit()
         else:
             if datetime.fromisoformat(time) > datetime.now():
+                return
+            new = self.session.query(news.News).filter(news.News.time == time).first()
+            if new is not None:
+                new.title = title
+                new.content = content
+                new.time = time
+                new.tofmal_id = tofmal_id
+                new.is_notice = is_notice
+                self.session.commit()
                 return
             new = news.News()
             new.title = title

@@ -351,4 +351,8 @@ def what_user_want(req, user_id):
 
 
 if __name__ == '__main__':
+    sprashivai = threading.Thread(target=update_db_questions)
+    sprashivai.start()
+    tofmal = threading.Thread(target=update_news)
+    tofmal.start()
     app.run()
