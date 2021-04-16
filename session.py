@@ -53,11 +53,11 @@ class Session:
                     len_questions += 1
         else:
             for i in list_questions:
-                try:
-                    self.add_question(i[0], i[1], i[2], i[3])
-                    len_questions += 1
-                except BaseException:
-                    pass
+                # try:
+                self.add_question(i[0], i[1], i[2], i[3])
+                len_questions += 1
+                # except BaseException:
+                #     pass
         list_users = self.session.query(users.User).all()
         for user in list_users:
             user.number_question_sprashivai += len_questions
