@@ -235,6 +235,13 @@ def old_user(res, req, user_id):
         res['response']['card']['title'] = 'Любич Геннадий Рувимович'
         res['response']['card']['description'] = get_random_phrases('about')
         res['response']['buttons'] = get_buttons("gr", f"https://tofmal.ru/people/employee/52")
+    elif wants == 'count_tofmal':
+        news_morph = pymorphy2.MorphAnalyzer().parse('новость')[0]
+        count = sessionStorage.get_count_news()
+        res['response']['text'] = res['response']['tts'] = \
+            get_random_phrases('count_news') + \
+            f' {count} ' + \
+            news_morph.make_agree_with_number(count).word
     elif 'tofmal' in wants:
         number = -1
         for i in req['request']['nlu']['entities']:
@@ -261,13 +268,6 @@ def old_user(res, req, user_id):
             get_random_phrases('count_sprashivai') + \
             f' {count} ' + \
             question_morph.make_agree_with_number(count).word
-    elif wants == 'count_tofmal':
-        news_morph = pymorphy2.MorphAnalyzer().parse('новость')[0]
-        count = sessionStorage.get_count_news()
-        res['response']['text'] = res['response']['tts'] = \
-            get_random_phrases('count_news') + \
-            f' {count} ' + \
-            news_morph.make_agree_with_number(count).word
     elif wants == 'show':
         res['response']['text'] = res['response']['tts'] = get_random_phrases('show_url')
     elif wants == 'listening':
